@@ -38,8 +38,10 @@ if(!empty($_FILES["campaign-file"]["name"])){
                     }else{
                         $query = $conn->prepare("INSERT into employees (employee_id,name,surname,email,phone,point) 
                         values (?,?,?,?,?,?)");
-                        $query->execute([$getData[3],$getData[0],$getData[1],$getData[2],$phone,$getData[5]]); 
-                        $processed_records++;
+                        $query->execute([$getData[3],$getData[0],$getData[1],$getData[2],$phone,$getData[5]]);
+                        if($query->rowCount()){
+                            $processed_records++;
+                        }
                     }
                     
                 }else{

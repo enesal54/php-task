@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Anamakine: 127.0.0.1
--- Üretim Zamanı: 27 Eki 2022, 15:59:23
+-- Üretim Zamanı: 27 Eki 2022, 16:51:01
 -- Sunucu sürümü: 10.4.24-MariaDB
 -- PHP Sürümü: 7.4.29
 
@@ -31,7 +31,7 @@ CREATE TABLE `employees` (
   `employee_id` bigint(20) NOT NULL,
   `name` varchar(50) NOT NULL,
   `surname` varchar(50) NOT NULL,
-  `email` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
   `phone` varchar(50) NOT NULL,
   `point` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

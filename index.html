@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+    <title>Mivento Assessment</title>
+
+    <style>
+      .container {
+        margin-top: 2rem !important;
+      }
+      .alert{
+        display: none;
+      }
+      .spinner{
+        background-image: url('spinner.gif');
+        background-repeat: no-repeat;
+        background-position: 5px;
+        background-size: 20px;
+      }
+    </style>
+    
+  </head>
+  <body>
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-5">
+          <div class="alert alert-success"></div>
+          <div class="alert alert-danger"></div>
+          <form class="needs-validation" novalidate>
+            <div class="mb-3">
+              <label for="campaign-name" class="form-label">Kampanya Adı</label>
+              <input type="text" class="form-control" name="campaign-name" id="campaign-name" required />
+            </div>
+            <div class="mb-3">
+              <select class="form-select" name="campaign-date" required>
+                <option selected disabled value="">Tarih Seçin</option>
+                <option value="2022-07">Temmuz 2022</option>
+                <option value="2022-08">Ağustos 2022</option>
+                <option value="2022-09">Eylül 2022</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="campaign-file" class="form-label">Dosya Yükleyin</label>
+              <input class="form-control" type="file" id="campaign-file" name="campaign-file" required />
+            </div>
+            <div class="d-grid">
+              <button class="btn btn-primary btn-block yukle" type="submit">Yükle</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js" integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk" crossorigin="anonymous"></script>
+
+    <script>
+      (function () {
+        'use strict';
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.querySelectorAll('.needs-validation');
+
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms)
+          .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+              event.preventDefault();
+              if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+              }else{
+                $.ajax({
+                    url : "functions.php",
+                    type: "POST",
+                    data : new FormData(this),
+                    dataType:"json",
+                    contentType:false,
+                    cache:false,
+                    processData:false,
+                    beforeSend: function(){
+                      $('.yukle').addClass("spinner");
+                      $('.yukle').text("Yükleniyor...");
+                    },
+                    success: function(data, textStatus, jqXHR)
+                    {
+                      $('.alert-danger').empty();
+                      $('.alert-success').empty();
+                      if(data['invalid_emails'].length>0){
+                        $('.alert-danger').show();
+                        $('.alert-danger').append("Geçersiz E-postalar<br>");
+                        jQuery.each( data['invalid_emails'], function( i, val ) {
+                          $('.alert-danger').append(val+"<br>");
+                        });
+                      }
+
+                      if(data['duplicate_records'].length>0){
+                        $('.alert-danger').show();
+                        $('.alert-danger').append("<br>Tekrarlanan Kayıtlar(employee_id)<br>");
+                        jQuery.each( data['duplicate_records'], function( i, val ) {
+                          $('.alert-danger').append(val+"<br>");
+                        });
+                      }
+                      $('.alert-success').show();
+                      $('.alert-success').append("İşlenen Kayıt Sayısı: "+data['processed_records']);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                      $('.alert-success').hide();
+                      $('.alert-danger').empty();
+                      $('.alert-danger').show();
+                      $('.alert-danger').append("İşleme sırasında hata oluştu.");
+                    },
+                    complete: function(){
+                      $('.yukle').removeClass("spinner");
+                      $('.yukle').text("Yükle");
+                    }
+                });
+              }
+
+              form.classList.add('was-validated');
+            }, false);
+          });
+      })();
+    </script>
+  </body>
+</html>
